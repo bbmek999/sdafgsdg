@@ -39,7 +39,6 @@ module.exports = products => {
         let matchID = promotion.products[matchIndex].proID;
 
         let matchIdIndex = _.findIndex(products, ["proID", matchID]);
-        console.log(matchIdIndex);
         products[matchIdIndex].price =
           products[matchIdIndex].price -
           promotion.products[matchIndex].discount;
@@ -53,7 +52,7 @@ module.exports = products => {
   function checkPro3() {
     promotion = {
       proName: "discount3",
-      proID: ["01", "02", "03", "04"],
+      proID: ["01", "02", "04"],
       discountPrice: 1000
     };
     let qty = 0;
@@ -61,7 +60,6 @@ module.exports = products => {
       if (_.includes(promotion.proID, products[i].proID)) {
         let amount = products[i].qty + qty;
         if (amount >= 2) {
-            console.log(products[i].qty)
           qty = amount % 2;
           products[i].discount = promotion.discountPrice * parseInt(amount / 2);
           products[i].promotionID = promotion.proName;
@@ -75,7 +73,7 @@ module.exports = products => {
   function checkPro4() {
     promotion = {
       proName: "discount4",
-      proID: "05",
+      proID: "03",
       qty: 5,
       freeID: "06"
     };
@@ -83,18 +81,30 @@ module.exports = products => {
       if (_.includes(promotion.proID, products[i].proID)) {
         let qty = products[i].qty;
         if (qty >= promotion.qty) {
-          products.push({
-            proID: promotion.freeID,
-            qty: 1,
-            price: 5000,
-            discount: 5000,
-            promotionID: "discount4"
-          });
+          products[i].promotionID = "discount4";
+          let indexFree = _.findIndex(products, ["proID", promotion.freeID]);
+          if (indexFree > -1) {
+            products[indexFree].discount = 5000;
+            products[indexFree].promotionID = "discount4";
+          } else {
+            products.push({
+              proID: promotion.freeID,
+              qty: 1,
+              price: 5000,
+              discount: 5000,
+              promotionID: "discount4"
+            });
+          }
+
           break;
         }
       }
     }
     return products;
   }
-  console.log(checkPro3());
+
+  function run() {
+    return checkPro4(checkPro3(checkPro1(products)));
+  }
+  console.log(run());
 };
